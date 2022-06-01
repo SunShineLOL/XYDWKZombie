@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 
-  s.name         = "WKZombie"
+  s.name         = "XYDWKZombie"
   s.version      = "1.1.2"
   s.summary      = "WKZombie is a Swift library for iOS/OSX to browse websites without the need of User Interface or API."
 
@@ -9,23 +9,23 @@ Pod::Spec.new do |s|
                    In addition, it can be used to run automated tests, take snapshots or manipulate websites using Javascript.
                    DESC
 
-  s.homepage     = "https://github.com/mkoehnke/WKZombie"
+  s.homepage     = "https://github.com/SunShineLOL/XYDWKZombie"
 
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
 
   s.author       = "Mathias Köhnke"
 
-  s.ios.deployment_target = '13.3'
+  s.ios.deployment_target = '10.0'
   s.osx.deployment_target = '10.14.2'
 
-  s.source       = { :git => "https://github.com/mkoehnke/WKZombie.git", :tag => s.version.to_s }
+  s.source       = { :git => "https://github.com/SunShineLOL/XYDWKZombie.git", :tag => s.version.to_s }
 
   s.source_files  = "Sources/WKZombie/*.{swift}"
   s.exclude_files = "Sources/Exclude"
 
   s.requires_arc = true
 
-  s.dependency 'hpple', '0.2.0' 
+  s.dependency 'xyd-hpple', '0.5.0'
 
   s.pod_target_xcconfig = { 'SWIFT_VERSION' => '5.2' }
 end
