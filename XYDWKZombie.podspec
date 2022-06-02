@@ -27,5 +27,5 @@ Pod::Spec.new do |s|
 
   s.dependency 'xyd-hpple', '0.5.0'
 
-  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '5.2' }
+  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '5.0' }
 end

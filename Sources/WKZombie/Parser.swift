@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 
 import Foundation
-import hpple
+import xyd_hpple
 
 /// Base class for the HTMLParser and JSONParser.
 public class Parser : CustomStringConvertible {

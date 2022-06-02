@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 
 import UIKit
-import WKZombie
+import XYDWKZombie
 
 class ProfileViewController: UITableViewController {
 
