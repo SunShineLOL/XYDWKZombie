@@ -14,9 +14,11 @@ Pod::Spec.new do |s|
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
 
   s.author       = "Mathias Köhnke"
+  
+  s.swift_version = '5.0'
 
-  s.ios.deployment_target = '10.0'
-  s.osx.deployment_target = '10.14.2'
+  s.platform = :ios, "10.0"
+  #s.osx.deployment_target = '10.14.2'
 
   s.source       = { :git => "https://github.com/SunShineLOL/XYDWKZombie.git", :tag => s.version.to_s }
 

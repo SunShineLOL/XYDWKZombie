@@ -1,0 +1,16 @@
+PODS:
+  - xyd-hpple (0.5.0)
+
+DEPENDENCIES:
+  - xyd-hpple
+
+SPEC REPOS:
+  trunk:
+    - xyd-hpple
+
+SPEC CHECKSUMS:
+  xyd-hpple: c170eb27258eb37bd36da4a40c02dbe7960acf3a
+
+PODFILE CHECKSUM: 2c6310ab2f886d8580763f06c83bca64956ca6c9
+
+COCOAPODS: 1.11.3
