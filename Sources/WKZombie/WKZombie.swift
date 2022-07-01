@@ -122,13 +122,13 @@ public class WKZombie {
     // MARK: Response Handling
     //========================================
     
-    fileprivate func _handleResponse(_ data: Data?, response: URLResponse?, error: Error?) -> Result<Data> {
+    fileprivate func _handleResponse(_ data: Data?, response: URLResponse?, error: Error?) -> ZNResult<Data> {
         var statusCode : Int = (error == nil) ? ActionError.Static.DefaultStatusCodeSuccess : ActionError.Static.DefaultStatusCodeError
         if let response = response as? HTTPURLResponse {
             statusCode = response.statusCode
         }
         let errorDomain : ActionError? = (error == nil) ? nil : .networkRequestFailure
-        let responseResult: Result<Response> = Result(errorDomain, Response(data: data, statusCode: statusCode))
+        let responseResult: ZNResult<Response> = ZNResult(errorDomain, Response(data: data, statusCode: statusCode))
         return responseResult >>> parseResponse
     }
     
@@ -142,10 +142,10 @@ public class WKZombie {
                 if let script = redirectable.actionScript() {
                     self._renderer.executeScript(script, willLoadPage: true, postAction: postAction, completionHandler: { result, response, error in
                         let data = self._handleResponse(result as? Data, response: response, error: error)
-                        completion(data >>> decodeResult(response?.url))
+                        completion(data >>> decodeZNResult(response?.url))
                     })
                 } else {
-                    completion(Result.error(.networkRequestFailure))
+                    completion(ZNResult.error(.networkRequestFailure))
                 }
             }
         }
@@ -183,7 +183,7 @@ public extension WKZombie {
                 let request = URLRequest(url: url)
                 self._renderer.renderPageWithRequest(request, postAction: postAction, completionHandler: { data, response, error in
                     let data = self._handleResponse(data as? Data, response: response, error: error)
-                    completion(data >>> decodeResult(response?.url))
+                    completion(data >>> decodeZNResult(response?.url))
                 })
             }
         }
@@ -198,7 +198,7 @@ public extension WKZombie {
         return Action() { [unowned self] completion in
             self._renderer.currentContent({ (result, response, error) in
                 let data = self._handleResponse(result as? Data, response: response, error: error)
-                completion(data >>> decodeResult(response?.url))
+                completion(data >>> decodeZNResult(response?.url))
             })
         }
     }
@@ -235,10 +235,10 @@ public extension WKZombie {
                 if let script = form.actionScript() {
                     self._renderer.executeScript(script, willLoadPage: true, postAction: postAction, completionHandler: { result, response, error in
                         let data = self._handleResponse(result as? Data, response: response, error: error)
-                        completion(data >>> decodeResult(response?.url))
+                        completion(data >>> decodeZNResult(response?.url))
                     })
                 } else {
-                    completion(Result.error(.networkRequestFailure))
+                    completion(ZNResult.error(.networkRequestFailure))
                 }
             }
         }
@@ -353,10 +353,10 @@ public extension WKZombie {
             return Action() { [unowned self] completion in
                 if let script = element.createSetAttributeCommand(key, value: value) {
                     self._renderer.executeScript("\(script) \(Renderer.scrapingCommand.terminate())", completionHandler: { result, response, error in
-                        completion(decodeResult(nil)(result as? Data))
+                        completion(decodeZNResult(nil)(result as? Data))
                     })
                 } else {
-                    completion(Result.error(.networkRequestFailure))
+                    completion(ZNResult.error(.networkRequestFailure))
                 }
             }
         }
@@ -380,7 +380,7 @@ public extension WKZombie {
      */
     public func getAll<T>(by searchType: SearchType<T>) -> (_ page: HTMLPage) -> Action<[T]> {
         return { (page: HTMLPage) -> Action<[T]> in
-            let elements : Result<[T]> = page.findElements(searchType)
+            let elements : ZNResult<[T]> = page.findElements(searchType)
             return Action(result: elements)
         }
     }
@@ -396,7 +396,7 @@ public extension WKZombie {
      */
     public func get<T>(by searchType: SearchType<T>) -> (_ page: HTMLPage) -> Action<T> {
         return { (page: HTMLPage) -> Action<T> in
-            let elements : Result<[T]> = page.findElements(searchType)
+            let elements : ZNResult<[T]> = page.findElements(searchType)
             return Action(result: elements.first())
         }
     }
@@ -466,13 +466,13 @@ public extension WKZombie {
                     switch data {
                     case .success(let value): fetchable.fetchedData = value
                     case .error(let error):
-                        completion(Result.error(error))
+                        completion(ZNResult.error(error))
                         return
                     }
-                    completion(Result.success(fetchable))
+                    completion(ZNResult.success(fetchable))
                 })
             } else {
-                completion(Result.error(.notFound))
+                completion(ZNResult.error(.notFound))
             }
         }
     }
@@ -617,9 +617,9 @@ public extension WKZombie {
             delay(DefaultSnapshotDelay, completion: {
                 if let snapshotHandler = self.snapshotHandler, let snapshot = self._renderer.snapshot() {
                     snapshotHandler(snapshot)
-                    completion(Result.success(element))
+                    completion(ZNResult.success(element))
                 } else {
-                    completion(Result.error(.snapshotFailure))
+                    completion(ZNResult.error(.snapshotFailure))
                 }
             })
         })

@@ -31,7 +31,10 @@ class LoginViewController : UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var loginButton : UIButton!
     
-    fileprivate let url = URL(string: "https://developer.apple.com/membercenter/index.action")!
+    //fileprivate let url = URL(string: "https://etax.guangdong.chinatax.gov.cn/xxmh/html/index.html")!
+    //fileprivate let url = URL(string: "https://developer.apple.com/membercenter/index.action")!
+    fileprivate let url = URL(string: "https://www.baidu.com")!
+
     fileprivate var snapshots = [Snapshot]()
     
     override func viewDidLoad() {
@@ -61,7 +64,7 @@ class LoginViewController : UIViewController {
     //========================================
     
     func getProvisioningProfiles(_ url: URL, user: String, password: String) {
-               open(url)
+        open(then: .wait(5))(url)
            >>* get(by: .id("accountname"))
            >>> setAttribute("value", value: user)
            >>* get(by: .id("accountpassword"))
@@ -103,6 +106,11 @@ class LoginViewController : UIViewController {
                 self?.activityIndicator.stopAnimating()
             }
         }
+    }
+    
+    func processPage(result: HTMLPage?) {
+        //result?.description // 这是你的完整 html
+        print(result?.description ?? "")
     }
     
     //========================================

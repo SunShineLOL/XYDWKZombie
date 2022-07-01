@@ -64,7 +64,7 @@ internal class Renderer {
         let doneLoadingUserScript = WKUserScript(source: doneLoadingWithoutMediaContentScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         
         let getElementByXPathScript = "function getElementByXpath(path) { " +
-                                      "   return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; " +
+                                      "   return document.evaluate(path, document, null, XPathZNResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; " +
                                       "}"
         let getElementUserScript = WKUserScript(source: getElementByXPathScript, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
         

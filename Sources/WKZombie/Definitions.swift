@@ -71,7 +71,7 @@ public enum SearchType<T: HTMLElement> {
 // MARK: Result
 //========================================
 
-public enum Result<T> {
+public enum ZNResult<T> {
     case success(T)
     case error(ActionError)
     
@@ -84,8 +84,8 @@ public enum Result<T> {
     }
 }
 
-public extension Result where T:Collection {
-    public func first<A>() -> Result<A> {
+public extension ZNResult where T:Collection {
+    public func first<A>() -> ZNResult<A> {
         switch self {
         case .success(let result): return resultFromOptional(result.first as? A, error: .notFound)
         case .error(let error): return resultFromOptional(nil, error: error)
@@ -93,7 +93,7 @@ public extension Result where T:Collection {
     }
 }
 
-extension Result: CustomDebugStringConvertible {
+extension ZNResult: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
         case .success(let value):
@@ -126,7 +126,7 @@ internal struct Response {
 }
 
 infix operator >>>: AdditionPrecedence
-internal func >>><A, B>(a: Result<A>, f: (A) -> Result<B>) -> Result<B> {
+internal func >>><A, B>(a: ZNResult<A>, f: (A) -> ZNResult<B>) -> ZNResult<B> {
     switch a {
     case let .success(x):   return f(x)
     case let .error(error): return .error(error)
@@ -206,21 +206,21 @@ public func ===<T>(a: Action<T>, completion: @escaping (T?) -> Void) {
  - parameter a:          An Action.
  - parameter completion: An output function/closure.
  */
-public func ===<T>(a: Action<T>, completion: @escaping (Result<T>) -> Void) {
+public func ===<T>(a: Action<T>, completion: @escaping (ZNResult<T>) -> Void) {
     return a.start { result in
         completion(result)
     }
 }
 
-internal func parseResponse(_ response: Response) -> Result<Data> {
+internal func parseResponse(_ response: Response) -> ZNResult<Data> {
     let successRange = 200..<300
     if !successRange.contains(response.statusCode) {
         return .error(.networkRequestFailure)
     }
-    return Result(nil, response.data ?? Data())
+    return ZNResult(nil, response.data ?? Data())
 }
 
-internal func resultFromOptional<A>(_ optional: A?, error: ActionError) -> Result<A> {
+internal func resultFromOptional<A>(_ optional: A?, error: ActionError) -> ZNResult<A> {
     if let a = optional {
         return .success(a)
     } else {
@@ -228,13 +228,13 @@ internal func resultFromOptional<A>(_ optional: A?, error: ActionError) -> Resul
     }
 }
 
-internal func decodeResult<T: Page>(_ url: URL? = nil) -> (_ data: Data?) -> Result<T> {
-    return { (data: Data?) -> Result<T> in
+internal func decodeZNResult<T: Page>(_ url: URL? = nil) -> (_ data: Data?) -> ZNResult<T> {
+    return { (data: Data?) -> ZNResult<T> in
         return resultFromOptional(T.pageWithData(data, url: url) as? T, error: .networkRequestFailure)
     }
 }
 
-internal func decodeString(_ data: Data?) -> Result<String> {
+internal func decodeString(_ data: Data?) -> ZNResult<String> {
     return resultFromOptional(data?.toString(), error: .transformFailure)
 }
 
@@ -245,7 +245,7 @@ internal func decodeString(_ data: Data?) -> Result<String> {
 //========================================
 
 public struct Action<T> {
-    public typealias ResultType = Result<T>
+    public typealias ResultType = ZNResult<T>
     public typealias Completion = (ResultType) -> ()
     public typealias AsyncOperation = (@escaping Completion) -> ()
     
@@ -286,8 +286,8 @@ public extension Action {
             self.start { result in
                 DispatchQueue.main.async(execute: {
                     switch result {
-                    case .success(let value): completion(Result.success(f(value)))
-                    case .error(let error): completion(Result.error(error))
+                    case .success(let value): completion(ZNResult.success(f(value)))
+                    case .error(let error): completion(ZNResult.error(error))
                     }
                 })
             }
@@ -301,11 +301,11 @@ public extension Action {
                     switch result {
                     case .success(let value):
                         if let result = f(value) {
-                            completion(Result.success(result))
+                            completion(ZNResult.success(result))
                         } else {
-                            completion(Result.error(.transformFailure))
+                            completion(ZNResult.error(.transformFailure))
                         }
-                    case .error(let error): completion(Result.error(error))
+                    case .error(let error): completion(ZNResult.error(error))
                     }
                 })
             }
@@ -319,7 +319,7 @@ public extension Action {
                 case .success(let value): f(value).start(completion)
                 case .error(let error):
                     DispatchQueue.main.async(execute: {
-                        completion(Result.error(error))
+                        completion(ZNResult.error(error))
                     })
                 }
             }
@@ -356,12 +356,12 @@ public extension Action {
                             loop(f(newValue)).start(completion)
                         } else {
                             DispatchQueue.main.async(execute: {
-                                completion(Result.success(values))
+                                completion(ZNResult.success(values))
                             })
                         }
                     case .error(let error):
                         DispatchQueue.main.async(execute: {
-                            completion(Result.error(error))
+                            completion(ZNResult.error(error))
                         })
                     }
                 }
@@ -392,13 +392,13 @@ public extension Action {
                         group.leave()
                     case .error(let error):
                         DispatchQueue.main.async(execute: {
-                            completion(Result.error(error))
+                            completion(ZNResult.error(error))
                         })
                     }
                 })
             }
             group.notify(queue: DispatchQueue.main) {
-                completion(Result.success(results))
+                completion(ZNResult.success(results))
             }
         })
     }
@@ -442,7 +442,7 @@ public enum PostAction {
 public typealias JSON = Any
 public typealias JSONElement = [String : Any]
 
-internal func parseJSON<U: JSON>(_ data: Data) -> Result<U> {
+internal func parseJSON<U: JSON>(_ data: Data) -> ZNResult<U> {
     var jsonOptional: U?
     var __error = ActionError.parsingFailure
     
@@ -458,26 +458,26 @@ internal func parseJSON<U: JSON>(_ data: Data) -> Result<U> {
     return resultFromOptional(jsonOptional, error: __error)
 }
 
-internal func decodeJSON<U: JSONDecodable>(_ json: JSON?) -> Result<U> {
+internal func decodeJSON<U: JSONDecodable>(_ json: JSON?) -> ZNResult<U> {
     if let element = json as? JSONElement {
         return resultFromOptional(U.decode(element), error: .parsingFailure)
     }
-    return Result.error(.parsingFailure)
+    return ZNResult.error(.parsingFailure)
 }
 
-internal func decodeJSON<U: JSONDecodable>(_ json: JSON?) -> Result<[U]> {
+internal func decodeJSON<U: JSONDecodable>(_ json: JSON?) -> ZNResult<[U]> {
     let result = [U]()
     if let elements = json as? [JSONElement] {
         var result = [U]()
         for element in elements {
-            let decodable : Result<U> = decodeJSON(element as JSON?)
+            let decodable : ZNResult<U> = decodeJSON(element as JSON?)
             switch decodable {
             case .success(let value): result.append(value)
-            case .error(let error): return Result.error(error)
+            case .error(let error): return ZNResult.error(error)
             }
         }
     }
-    return Result.success(result)
+    return ZNResult.success(result)
 }
 
 

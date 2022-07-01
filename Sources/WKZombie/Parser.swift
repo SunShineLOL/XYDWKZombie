@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 
 import Foundation
-import xyd_hpple
+//import xyd_hpple
 
 /// Base class for the HTMLParser and JSONParser.
 public class Parser : CustomStringConvertible {
@@ -54,11 +54,11 @@ public class Parser : CustomStringConvertible {
 /// A HTML Parser class, which wraps the functionality of the TFHpple class.
 public class HTMLParser : Parser {
     
-    fileprivate var doc : TFHpple?
+    fileprivate var doc : ZNHpple?
     
     required public init(data: Data, url: URL? = nil) {
         super.init(data: data, url: url)
-        self.doc = TFHpple(htmlData: data)
+        self.doc = ZNHpple(htmlData: data)
     }
     
     public func searchWithXPathQuery(_ xPathOrCSS: String) -> [AnyObject]? {
@@ -76,11 +76,11 @@ public class HTMLParser : Parser {
 
 /// A HTML Parser Element class, which wraps the functionality of the TFHppleElement class.
 public class HTMLParserElement : CustomStringConvertible, Initializable {
-    fileprivate var element : TFHppleElement?
+    fileprivate var element : ZNHppleElement?
     public internal(set) var XPathQuery : String?
     
     required public init?(element: AnyObject, XPathQuery : String? = nil) {
-        if let element = element as? TFHppleElement {
+        if let element = element as? ZNHppleElement {
             self.element = element
             self.XPathQuery = XPathQuery
         } else {
@@ -137,7 +137,7 @@ public class JSONParser : Parser {
     
     required public init(data: Data, url: URL? = nil) {
         super.init(data: data, url: url)
-        let result : Result<JSON> = parseJSON(data)
+        let result : ZNResult<JSON> = parseJSON(data)
         switch result {
         case .success(let json): self.json = json
         case .error: Logger.log("Error parsing JSON!")
